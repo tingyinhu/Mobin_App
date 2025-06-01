@@ -1,20 +1,58 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-export default function App() {
+import { Icon } from "@rneui/themed";
+
+import HomeScreen from './screens/HomeScreen';
+import DonutScreen from "./screens/DonutScreen";
+import OrderScreen from "./screens/OrderScreen";
+import DonutDetailScreen from "./screens/DonutDetailScreen";
+
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function TabNavigator() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator>
+      <Tab.Screen
+        name="Donuts"
+        component={DonutScreen}
+        options={{
+          tabBarIcon: () => <Icon type="font-awesome-5" name="clipboard-list" />,
+        }}
+      />
+      <Tab.Screen
+        name="Orders"
+        component={OrderScreen}
+        options={{
+          tabBarIcon: () => <Icon type="font-awesome-5" name="shopping-cart" />,
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="HomeTabs"
+          component={TabNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="DonutDetail"
+          component={DonutDetailScreen}
+          options={{ title: "Donut Detail" }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
