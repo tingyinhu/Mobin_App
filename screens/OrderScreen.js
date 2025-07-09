@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, Icon, Button } from "@rneui/themed";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "../theme/theme";
 
 export default function OrderScreen() {
@@ -16,6 +16,21 @@ export default function OrderScreen() {
   useEffect(() => {
     loadCart();
   }, []);
+
+  const imageMap = {
+    "Chocolate Glaze": require("../assets/donuts/ChocolateDonut.jpg"),
+    "Strawberry Sprinkle": require("../assets/donuts/StrawberryDonut.jpg"),
+    "Vanilla Dream": require("../assets/donuts/VanillaDonut.jpg"),
+    "Oreo Cookie": require("../assets/donuts/OreoDonut.jpg"),
+    "Birthday Cake": require("../assets/donuts/BirthdayCakeDonut.jpg"),
+    "Cheesy Ring": require("../assets/donuts/CheesyRingDonut.jpg"),
+    "Choco Pop": require("../assets/donuts/ChocoPopDonut.jpg"),
+    "Choco Spark": require("../assets/donuts/ChocoSparkDonut.jpg"),
+    "Crunchy Nut": require("../assets/donuts/CrunchyNutDonut.jpg"),
+    "Golden Honey": require("../assets/donuts/GoldenHoneyDonut.jpg"),
+    "Mint Choco Cloud": require("../assets/donuts/MintChocoCupcake.jpg"),
+    "Donut Box": require("../assets/donuts/DonutBox.jpg"),
+  };
 
   const loadCart = async () => {
     try {
@@ -35,14 +50,16 @@ export default function OrderScreen() {
 
   const increaseQty = (id) => {
     const updated = cartItems.map((item) =>
-      item.id === id ? { ...item, qty: item.qty + 1 } : item
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
     );
     updateCart(updated);
   };
 
   const decreaseQty = (id) => {
     const updated = cartItems.map((item) =>
-      item.id === id && item.qty > 1 ? { ...item, qty: item.qty - 1 } : item
+      item.id === id && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
     );
     updateCart(updated);
   };
@@ -52,20 +69,23 @@ export default function OrderScreen() {
     updateCart(updated);
   };
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const taxes = subtotal * 0.1; // 10% tax
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const taxes = Math.round(subtotal * 0.1);
   const total = subtotal + taxes;
 
   const renderItem = ({ item }) => (
     <View style={styles.itemRow}>
-      <Image source={item.image} style={styles.donutImage} />
+      <Image source={imageMap[item.name]} style={styles.donutImage} />
       <Text style={styles.name}>{item.name}</Text>
 
       <View style={styles.qtyControl}>
         <TouchableOpacity onPress={() => decreaseQty(item.id)}>
           <Icon name="minus" type="font-awesome-5" size={14} />
         </TouchableOpacity>
-        <Text style={styles.qtyText}>{item.qty.toString().padStart(2, "0")}</Text>
+        <Text style={styles.qtyText}>{item.quantity.toString().padStart(2, "0")}</Text>
         <TouchableOpacity onPress={() => increaseQty(item.id)}>
           <Icon name="plus" type="font-awesome-5" size={14} />
         </TouchableOpacity>

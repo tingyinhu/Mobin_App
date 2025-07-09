@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontWeight: theme.typography.fontWeight.semiBold, 
-    color: theme.colors.buttonText, 
+    color: theme.colors.WhiteText, 
     fontSize: theme.typography.fontSize.large, 
     paddingVertical: theme.spacing.small,
     paddingHorizontal: theme.spacing.medium,
