@@ -1,10 +1,7 @@
-import {
-  StyleSheet,
-  View,
-  ImageBackground,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, ImageBackground, TouchableOpacity } from "react-native";
 import { Text } from "@rneui/themed";
+
+import { theme } from '../theme/theme';  
 
 export default function HomeScreen({ navigation }) {
   return (
@@ -47,7 +44,7 @@ const styles = StyleSheet.create({
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.6)", // white with opacity
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
   },
 
   content: {
@@ -57,23 +54,23 @@ const styles = StyleSheet.create({
   },
 
   headingText: {
-    color: "#EC6852",
-    fontWeight: "700",
+    color: theme.colors.primary, 
+    fontWeight: theme.typography.fontWeight.bold, 
     textAlign: "center",
-    marginBottom: 200,
+    marginBottom: theme.spacing.xLarge, 
   },
 
   button: {
-    backgroundColor: "#EC6852",
-    paddingHorizontal: 30,
+    backgroundColor: theme.colors.primary, 
+    paddingHorizontal: theme.spacing.large,
     borderRadius: 30,
   },
 
   buttonText: {
-    fontWeight: "600",
-    color: "#fff",
-    fontSize: 20,
-    paddingVertical:8,
-    paddingHorizontal:20,
+    fontWeight: theme.typography.fontWeight.semiBold, 
+    color: theme.colors.buttonText, 
+    fontSize: theme.typography.fontSize.large, 
+    paddingVertical: theme.spacing.small,
+    paddingHorizontal: theme.spacing.medium,
   },
 });

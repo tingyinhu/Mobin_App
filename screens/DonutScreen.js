@@ -8,99 +8,93 @@ import {
 } from "react-native";
 import { Text, Card } from "@rneui/themed";
 
+import donutsData from "../data/donuts.json";
+
+import { theme } from "../theme/theme";
+
 export default function DonutScreen({ navigation }) {
-  //state declarations here
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [data, setData] = useState([]);
 
-  // useEffect with fatch here
   useEffect(() => {
-    const uri = "https://flash-lemon-double.glitch.me/donuts";
-
-    fetch(uri)
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          // console.log(result);
-          setData(result);
-          setIsLoaded(true);
-        },
-        (error) => {
-          setError(error);
-          setIsLoaded(true);
-        }
-      );
+    try {
+      setTimeout(() => {
+        setData(donutsData.donuts);
+        setIsLoaded(true);
+      }, 500);
+    } catch (err) {
+      setError(err);
+      setIsLoaded(true);
+    }
   }, []);
 
-  function displayData(error, isLoaded, data, navigation) {
-    const renderItem = ({ item }) => (
-      <View style={styles.donutCard}>
-        <View style={styles.imageContainer}>
-          <Card.Image
-            source={{ uri: item.image }}
-            style={styles.image}
-            resizeMode="contain"
-          />
-        </View>
+  const imageMap = {
+    "Chocolate Glaze": require("../assets/donuts/ChocolateDonut.jpg"),
+    "Strawberry Sprinkle": require("../assets/donuts/StrawberryDonut.jpg"),
+    "Vanilla Dream": require("../assets/donuts/VanillaDonut.jpg"),
+    "Oreo Cookie": require("../assets/donuts/OreoDonut.jpg"),
+    "Birthday Cake": require("../assets/donuts/BirthdayCakeDonut.jpg"),
+    "Cheesy Ring": require("../assets/donuts/CheesyRingDonut.jpg"),
+    "Choco Pop": require("../assets/donuts/ChocoPopDonut.jpg"),
+    "Choco Spark": require("../assets/donuts/ChocoSparkDonut.jpg"),
+    "Crunchy Nut": require("../assets/donuts/CrunchyNutDonut.jpg"),
+    "Golden Honey": require("../assets/donuts/GoldenHoneyDonut.jpg"),
+    "Mint Choco Cloud": require("../assets/donuts/MintChocoCupcake.jpg"),
+    "Donut Box": require("../assets/donuts/DonutBox.jpg"),
+  };
 
-        <View style={styles.infoSection}>
-          <Text style={styles.name}>{item.name}</Text>
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={styles.detailButton}
-              onPress={() =>
-                navigation.navigate("DonutDetail", { donutId: item.id })
-              }
-            >
-              <Text style={styles.detailText}>View Detail</Text>
-            </TouchableOpacity>
+  const renderItem = ({ item }) => (
+    <View style={styles.donutCard}>
+      <View style={styles.imageContainer}>
+        <Card.Image
+          source={imageMap[item.name]}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      </View>
 
-            <View style={styles.priceTag}>
-              <Text style={styles.price}>${item.price}</Text>
-            </View>
+      <View style={styles.infoSection}>
+        <Text style={styles.name}>{item.name}</Text>
+        <View style={styles.actionRow}>
+          <TouchableOpacity
+            style={styles.detailButton}
+            onPress={() =>
+              navigation.navigate("DonutDetail", { donutId: item.id })
+            }
+          >
+            <Text style={styles.detailText}>View Detail</Text>
+          </TouchableOpacity>
+
+          <View style={styles.priceTag}>
+            <Text style={styles.price}>${item.price}</Text>
           </View>
         </View>
       </View>
-    );
+    </View>
+  );
 
-    if (error) {
-      return (
-        <View>
-          <Text>There was an error with your request.</Text>
-        </View>
-      );
-    } else if (!isLoaded) {
-      return (
-        <View>
-          <ActivityIndicator size="large"/>
-          <Text>Loading...</Text>
-        </View>
-      );
-    } else if (data.length === 0) {
-      return (
-        <View style={styles.container}>
-          <Text>Not found.</Text>
-        </View>
-      );
-    } else {
-      return (
+  return (
+    <View style={styles.container}>
+      {error ? (
+        <Text style={styles.errorText}>There was an error with your request.</Text>
+      ) : !isLoaded ? (
+        <>
+          <ActivityIndicator size="large" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </>
+      ) : data.length === 0 ? (
+        <Text style={styles.errorText}>Not found.</Text>
+      ) : (
         <FlatList
           data={data}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           style={styles.list}
           numColumns={2}
           columnWrapperStyle={{ justifyContent: "space-between" }}
         />
-      );
-    }
-  }
-
-  //return statement
-  return (
-    <View style={styles.container}>
-      {displayData(error, isLoaded, data, navigation)}
+      )}
     </View>
   );
 }
@@ -108,45 +102,43 @@ export default function DonutScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F5DE",
+    backgroundColor: theme.colors.background,
     alignItems: "center",
     justifyContent: "flex-start",
     width: "100%",
-    paddingTop: 25,
+    paddingTop: theme.spacing.medium,
   },
-
   list: {
     width: "100%",
   },
-
   donutCard: {
     backgroundColor: "#fff",
     borderTopRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: "45%",
-    margin: 10,
+    margin: theme.spacing.small,
   },
   imageContainer: {
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: theme.spacing.small,
   },
   image: {
     width: 150,
     height: 150,
   },
   infoSection: {
-    backgroundColor: "#C98B45",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.small,
+    paddingHorizontal: theme.spacing.medium,
     borderBottomLeftRadius: 24,
     borderTopRightRadius: 24,
   },
   name: {
-    fontSize: 16,
-    fontWeight: "800",
+    fontSize: theme.typography.fontSize.medium,
+    fontWeight: theme.typography.fontWeight.bold,
     color: "#fff",
     textAlign: "left",
-    marginBottom: 8,
+    marginBottom: theme.spacing.small,
   },
   actionRow: {
     flexDirection: "row",
@@ -156,19 +148,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomRightRadius: 16,
     borderTopLeftRadius: 16,
-    padding: 8,
+    padding: theme.spacing.small,
   },
   detailText: {
-    color: "#C98B45",
-    fontWeight: "800",
+    color: theme.colors.primary,
+    fontWeight: theme.typography.fontWeight.bold,
   },
   priceTag: {
-    backgroundColor: "#F8F5DE",
+    backgroundColor: theme.colors.background,
     borderRadius: 16,
-    padding: 8,
+    padding: theme.spacing.small,
   },
   price: {
-    fontWeight: "800",
-    color: "#C98B45",
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primary,
+  },
+  errorText: {
+    color: theme.colors.secondary,
+    fontSize: theme.typography.fontSize.medium,
+    marginTop: theme.spacing.medium,
+  },
+  loadingText: {
+    fontSize: theme.typography.fontSize.medium,
+    marginTop: theme.spacing.small,
   },
 });

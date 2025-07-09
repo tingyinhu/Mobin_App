@@ -1,0 +1,112 @@
+{
+  "donuts": [
+    {
+      "id": 1,
+      "name": "Chocolate Glaze",
+      "price": 5,
+      "description": "Rich chocolate coating.",
+      "ingredients": "Flour, sugar, cocoa powder, milk, glaze (sugar, cocoa, vegetable oil), yeast.",
+      "practicalInfo": "Contains gluten, dairy. Best consumed fresh.",
+      "modalDescription": "A classic favorite—our Chocolate Glaze donut is dipped in a velvety chocolate coating that crackles with every bite. Simple, indulgent, and always satisfying."
+    },
+    {
+      "id": 2,
+      "name": "Strawberry Sprinkle",
+      "price": 6,
+      "description": "Sweet strawberry glaze with sprinkles.",
+      "ingredients": "Flour, sugar, strawberry puree, milk, sprinkles (sugar, cornstarch, food coloring), yeast.",
+      "practicalInfo": "Contains gluten, dairy. Vibrant sprinkles may stain.",
+      "modalDescription": "A burst of summer in every bite! Our Strawberry Sprinkle donut is topped with a tangy-sweet glaze and colorful confetti for a playful treat."
+    },
+    {
+      "id": 3,
+      "name": "Vanilla Dream",
+      "price": 7,
+      "description": "Soft vanilla with a sugar dusting.",
+      "ingredients": "Flour, sugar, vanilla bean paste, milk, butter, powdered sugar.",
+      "practicalInfo": "Contains gluten, dairy. Delicate vanilla aroma.",
+      "modalDescription": "Cloud-like and comforting, our Vanilla Dream donut is lightly dusted with powdered sugar for a melt-in-your-mouth experience."
+    },
+    {
+      "id": 4,
+      "name": "Oreo Cookie",
+      "price": 8,
+      "description": "Double-stuffed delight in each bite.",
+      "ingredients": "Flour, sugar, crushed Oreo cookies, cream filling (sugar, vegetable oil, cocoa), milk.",
+      "practicalInfo": "Contains gluten, dairy, soy. Crunchy cookie texture.",
+      "modalDescription": "Cookie lovers rejoice! This donut is packed with Oreo crumbs and a creamy filling for a nostalgic crunch-and-cream combo."
+    },
+    {
+      "id": 5,
+      "name": "Birthday Cake",
+      "price": 9,
+      "description": "Celebrate with birthday cake bliss.",
+      "ingredients": "Flour, sugar, rainbow sprinkles, vanilla frosting, milk, edible glitter.",
+      "practicalInfo": "Contains gluten, dairy. Festive and shareable!",
+      "modalDescription": "It’s always party time with our Birthday Cake donut! Topped with vanilla frosting, rainbow sprinkles, and a touch of edible glitter."
+    },
+    {
+      "id": 6,
+      "name": "Cheesy Ring",
+      "price": 5,
+      "description": "Salty cream cheese punch.",
+      "ingredients": "Flour, sugar, cream cheese, butter, salt, yeast.",
+      "practicalInfo": "Contains gluten, dairy. Sweet-savory balance.",
+      "modalDescription": "For those who dare to mix sweet and savory! Our Cheesy Ring donut has a rich cream cheese swirl with a hint of salt for a bold twist."
+    },
+    {
+      "id": 7,
+      "name": "Choco Pop",
+      "price": 8,
+      "description": "Fun-shaped donut with a shiny glaze.",
+      "ingredients": "Flour, sugar, cocoa, milk, chocolate glaze (sugar, cocoa, coconut oil).",
+      "practicalInfo": "Contains gluten, dairy. Eye-catching shape!",
+      "modalDescription": "A donut that’s as fun to look at as it is to eat! The Choco Pop’s unique shape and glossy chocolate glaze make it irresistible."
+    },
+    {
+      "id": 8,
+      "name": "Choco Spark",
+      "price": 6,
+      "description": "Glossy chocolate donut with glitter.",
+      "ingredients": "Flour, sugar, cocoa, edible glitter (cornstarch, food-grade mica), milk.",
+      "practicalInfo": "Contains gluten, dairy. Sparkles fade over time.",
+      "modalDescription": "Dazzling and decadent! The Choco Spark donut is dipped in glossy chocolate and finished with edible glitter for a magical bite."
+    },
+    {
+      "id": 9,
+      "name": "Crunchy Nut",
+      "price": 7,
+      "description": "Crispy donut packed with crunchy nuts.",
+      "ingredients": "Flour, sugar, mixed nuts (almonds, peanuts), honey, yeast.",
+      "practicalInfo": "Contains gluten, nuts. Extra crunchy texture.",
+      "modalDescription": "Nut lovers, this one’s for you! Our Crunchy Nut donut is topped with a generous layer of toasted nuts for maximum crunch."
+    },
+    {
+      "id": 10,
+      "name": "Golden Honey",
+      "price": 5,
+      "description": "Soft donut glazed in sweet honey.",
+      "ingredients": "Flour, sugar, local honey, milk, yeast.",
+      "practicalInfo": "Contains gluten, dairy. Sticky-sweet perfection.",
+      "modalDescription": "A golden, honey-drenched delight! This donut is softly baked and dipped in warm honey glaze for a naturally sweet treat."
+    },
+    {
+      "id": 11,
+      "name": "Mint Choco Cloud",
+      "price": 4,
+      "description": "Chocolate cupcake with a mint cream burst.",
+      "ingredients": "Flour, sugar, cocoa, mint extract, fresh cream, dark chocolate.",
+      "practicalInfo": "Contains gluten, dairy. Limited-time holiday special!",
+      "modalDescription": "A winter surprise! Our Mint Choco Cloud cupcake hides a refreshing mint cream center inside a rich chocolate shell—perfect for the holidays."
+    },
+    {
+      "id": 12,
+      "name": "Donut Box",
+      "price": 1,
+      "description": "Compact box for 12 Mobin donuts.",
+      "ingredients": "Cardboard, food-safe ink.",
+      "practicalInfo": "Recyclable. Fits 12 donuts snugly.",
+      "modalDescription": "The perfect way to share joy! Our sturdy Donut Box keeps your treats safe and stylish—ideal for gifting or parties."
+    }
+  ]
+}

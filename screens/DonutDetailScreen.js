@@ -1,9 +1,28 @@
-import { StyleSheet, View, Image, ScrollView, ActivityIndicator } from "react-native";
-import { Text, Icon } from "@rneui/themed";
 import { useEffect, useState } from "react";
 
+import { StyleSheet, View, Image, ScrollView, ActivityIndicator } from "react-native";
+import { Text, Icon } from "@rneui/themed";
+
+import { theme } from "../theme/theme";
+import donutsData from "../data/donuts.json";
+
+const imageMap = {
+  "Chocolate Glaze": require("../assets/donuts/ChocolateDonut.jpg"),
+  "Strawberry Sprinkle": require("../assets/donuts/StrawberryDonut.jpg"),
+  "Vanilla Dream": require("../assets/donuts/VanillaDonut.jpg"),
+  "Oreo Cookie": require("../assets/donuts/OreoDonut.jpg"),
+  "Birthday Cake": require("../assets/donuts/BirthdayCakeDonut.jpg"),
+  "Cheesy Ring": require("../assets/donuts/CheesyRingDonut.jpg"),
+  "Choco Pop": require("../assets/donuts/ChocoPopDonut.jpg"),
+  "Choco Spark": require("../assets/donuts/ChocoSparkDonut.jpg"),
+  "Crunchy Nut": require("../assets/donuts/CrunchyNutDonut.jpg"),
+  "Golden Honey": require("../assets/donuts/GoldenHoneyDonut.jpg"),
+  "Mint Choco Cloud": require("../assets/donuts/MintChocoCupcake.jpg"),
+  "Donut Box": require("../assets/donuts/DonutBox.jpg"),
+};
+
 export default function DonutDetailScreen({ route }) {
-  const { donutId } = route.params; // passed from list screen
+  const { donutId } = route.params;
   const [donut, setDonut] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
@@ -11,12 +30,9 @@ export default function DonutDetailScreen({ route }) {
   useEffect(() => {
     const fetchDonut = async () => {
       try {
-        const response = await fetch(`https://flash-lemon-double.glitch.me/donuts/${donutId}`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setDonut(data);
+        const foundDonut = donutsData.donuts.find((d) => d.id === donutId);
+        if (!foundDonut) throw new Error("Donut not found");
+        setDonut(foundDonut);
       } catch (err) {
         setError(err);
       } finally {
@@ -29,32 +45,32 @@ export default function DonutDetailScreen({ route }) {
 
   if (error) {
     return (
-        <View>
-          <Text>There was an error with your request.</Text>
-        </View>
+      <View style={styles.container}>
+        <Text style={styles.errorText}>There was an error with your request.</Text>
+      </View>
     );
   }
 
   if (!isLoaded) {
     return (
-        <View>
-          <ActivityIndicator size="large"/>
-          <Text>Loading...</Text>
-        </View>
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
     );
   }
 
   if (!donut) {
     return (
       <View style={styles.container}>
-        <Text>No donut data available.</Text>
+        <Text style={styles.errorText}>No donut data available.</Text>
       </View>
     );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: donut.image }} style={styles.image} />
+      <Image source={imageMap[donut.name]} style={styles.image} />
 
       <View style={styles.header}>
         <Text h4 style={styles.name}>{donut.name}</Text>
@@ -67,16 +83,16 @@ export default function DonutDetailScreen({ route }) {
 
       <View style={styles.section}>
         <View style={styles.iconRow}>
-          <Icon name="list" type="font-awesome-5" color="#EC6852" size={18} />
-          <Text style={styles.sectionTitle}> Ingredients</Text>
+          <Icon name="list" type="font-awesome-5" color={theme.colors.primary} size={18} />
+          <Text style={styles.sectionTitle}>Ingredients</Text>
         </View>
         <Text style={styles.body}>{donut.ingredients}</Text>
       </View>
 
       <View style={styles.section}>
         <View style={styles.iconRow}>
-          <Icon name="info-circle" type="font-awesome-5" color="#F46E4E" size={18} />
-          <Text style={styles.sectionTitle}> Details</Text>
+          <Icon name="info-circle" type="font-awesome-5" color={theme.colors.secondary} size={18} />
+          <Text style={styles.sectionTitle}>Details</Text>
         </View>
         <Text style={styles.body}>{donut.practicalInfo}</Text>
       </View>
@@ -87,17 +103,17 @@ export default function DonutDetailScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#F8F5DE",
+    backgroundColor: theme.colors.background,
     alignItems: "center",
     justifyContent: "flex-start",
-    padding: 25,
+    padding: theme.spacing.medium,
   },
   image: {
     width: 250,
     height: 250,
     borderTopRightRadius: 24,
     borderBottomLeftRadius: 24,
-    marginBottom: 24,
+    marginBottom: theme.spacing.large,
     resizeMode: "contain",
   },
   header: {
@@ -105,48 +121,58 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    marginBottom: 10,
+    marginBottom: theme.spacing.small,
   },
   name: {
-    color: "#EC6852",
+    color: theme.colors.primary,
+    fontSize: theme.typography.fontSize.large,
   },
   priceBadge: {
-    backgroundColor: "#EC6852",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing.small,
+    paddingVertical: theme.spacing.small,
     borderRadius: 16,
   },
   price: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+    color: theme.colors.WhiteText,
+    fontWeight: theme.typography.fontWeight.bold,
+    fontSize: theme.typography.fontSize.medium,
   },
   description: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.medium,
     textAlign: "left",
     width: "100%",
     lineHeight: 24,
-    color: "#333",
+    color: theme.colors.text,
   },
   section: {
     width: "100%",
-    marginTop: 20,
+    marginTop: theme.spacing.large,
   },
   iconRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: theme.spacing.small,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    marginLeft: 8,
+    fontSize: theme.typography.fontSize.large,
+    fontWeight: theme.typography.fontWeight.bold,
+    marginLeft: theme.spacing.small,
+    color: theme.colors.primary,
   },
   body: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.medium,
     textAlign: "left",
     width: "100%",
     lineHeight: 24,
-    color: "#333",
+    color: theme.colors.text,
+  },
+  errorText: {
+    fontSize: theme.typography.fontSize.medium,
+    color: theme.colors.secondary,
+  },
+  loadingText: {
+    fontSize: theme.typography.fontSize.medium,
+    color: theme.colors.text,
   },
 });
