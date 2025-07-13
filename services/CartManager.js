@@ -12,6 +12,15 @@ const cartState = hookstate({
   count: 0,   // total unique items
 });
 
+// Save cart to AsyncStorage whenever it changes
+async function saveCartToStorage(cart) {
+  try {
+    await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  } catch (error) {
+    console.error("Failed to save cart to storage:", error);
+  }
+}
+
 // Load cart from AsyncStorage when the app starts
 async function loadCartFromStorage() {
   try {
@@ -22,15 +31,6 @@ async function loadCartFromStorage() {
     }
   } catch (error) {
     console.error("Failed to load cart from storage:", error);
-  }
-}
-
-// Save cart to AsyncStorage whenever it changes
-async function saveCartToStorage(cart) {
-  try {
-    await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-  } catch (error) {
-    console.error("Failed to save cart to storage:", error);
   }
 }
 
