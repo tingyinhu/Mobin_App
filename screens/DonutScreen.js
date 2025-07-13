@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, Card, Icon } from "@rneui/themed";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 import donutsData from "../data/donuts.json";
 import { theme } from "../theme/theme";
+import { addToCart } from "../services/CartManager";
 
-export default function DonutScreen({ navigation }) {
+export default function DonutScreen() {
+  const navigation = useNavigation();
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [data, setData] = useState([]);
@@ -44,21 +46,9 @@ export default function DonutScreen({ navigation }) {
     "Donut Box": require("../assets/donuts/DonutBox.jpg"),
   };
 
-  const addToCart = async (item) => {
-    try {
-      const existing = await AsyncStorage.getItem("cart");
-      let cart = existing ? JSON.parse(existing) : [];
-      const index = cart.findIndex((d) => d.id === item.id);
-      if (index > -1) {
-        cart[index].quantity += 1;
-      } else {
-        cart.push({ ...item, quantity: 1 });
-      }
-      await AsyncStorage.setItem("cart", JSON.stringify(cart));
-      console.log("Added to cart:", item.name);
-    } catch (e) {
-      console.log("Error adding to cart:", e);
-    }
+  const handleAddToCart = async (item) => {
+    await addToCart(item);
+    console.log("Added to cart:", item.name);
   };
 
   const renderItem = ({ item }) => (
@@ -69,7 +59,7 @@ export default function DonutScreen({ navigation }) {
           style={styles.image}
           resizeMode="contain"
         />
-        <TouchableOpacity style={styles.cartIcon} onPress={() => addToCart(item)}>
+        <TouchableOpacity style={styles.cartIcon} onPress={() => handleAddToCart(item)}>
           <Icon name="shopping-bag" type="feather" color={theme.colors.secondary} size={20} />
         </TouchableOpacity>
       </View>
@@ -150,7 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 20,
     padding: 4,
-    elevation: 2,
+    elevation: 1,
   },
   image: {
     width: 150,

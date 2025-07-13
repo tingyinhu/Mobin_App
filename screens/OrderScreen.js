@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+
 import {
   View,
   StyleSheet,
@@ -7,15 +9,38 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, Icon, Button } from "@rneui/themed";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "../theme/theme";
+
+import {
+  getCart,
+  updateQuantity,
+  removeFromCart,
+  saveCart,
+} from "../services/CartManager";
 
 export default function OrderScreen() {
   const [cartItems, setCartItems] = useState([]);
 
-  useEffect(() => {
-    loadCart();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCart();
+    }, [])
+  );
+
+  const loadCart = async () => {
+    const cart = await getCart();
+    setCartItems(cart);
+  };
+
+  const handleUpdateQty = async (id, change) => {
+    const updatedCart = await updateQuantity(id, change);
+    setCartItems(updatedCart);
+  };
+
+  const handleRemove = async (id) => {
+    const updatedCart = await removeFromCart(id);
+    setCartItems(updatedCart);
+  };
 
   const imageMap = {
     "Chocolate Glaze": require("../assets/donuts/ChocolateDonut.jpg"),
@@ -32,43 +57,6 @@ export default function OrderScreen() {
     "Donut Box": require("../assets/donuts/DonutBox.jpg"),
   };
 
-  const loadCart = async () => {
-    try {
-      const storedCart = await AsyncStorage.getItem("cart");
-      if (storedCart) {
-        setCartItems(JSON.parse(storedCart));
-      }
-    } catch (err) {
-      console.log("Error loading cart:", err);
-    }
-  };
-
-  const updateCart = async (updatedCart) => {
-    setCartItems(updatedCart);
-    await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
-
-  const increaseQty = (id) => {
-    const updated = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-    );
-    updateCart(updated);
-  };
-
-  const decreaseQty = (id) => {
-    const updated = cartItems.map((item) =>
-      item.id === id && item.quantity > 1
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    );
-    updateCart(updated);
-  };
-
-  const removeItem = (id) => {
-    const updated = cartItems.filter((item) => item.id !== id);
-    updateCart(updated);
-  };
-
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
@@ -82,19 +70,25 @@ export default function OrderScreen() {
       <Text style={styles.name}>{item.name}</Text>
 
       <View style={styles.qtyControl}>
-        <TouchableOpacity onPress={() => decreaseQty(item.id)}>
+        <TouchableOpacity onPress={() => handleUpdateQty(item.id, -1)}>
           <Icon name="minus" type="font-awesome-5" size={14} />
         </TouchableOpacity>
-        <Text style={styles.qtyText}>{item.quantity.toString().padStart(2, "0")}</Text>
-        <TouchableOpacity onPress={() => increaseQty(item.id)}>
+        <Text style={styles.qtyText}>
+          {item.quantity.toString().padStart(2, "0")}
+        </Text>
+        <TouchableOpacity onPress={() => handleUpdateQty(item.id, 1)}>
           <Icon name="plus" type="font-awesome-5" size={14} />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.price}>${item.price}</Text>
 
-      <TouchableOpacity onPress={() => removeItem(item.id)}>
-        <Icon name="trash-alt" type="font-awesome-5" color={theme.colors.primary} />
+      <TouchableOpacity onPress={() => handleRemove(item.id)}>
+        <Icon
+          name="trash-alt"
+          type="font-awesome-5"
+          color={theme.colors.primary}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -119,8 +113,12 @@ export default function OrderScreen() {
         </View>
         <View style={styles.line} />
         <View style={styles.summaryRow}>
-          <Text style={[styles.summaryLabel, { color: theme.colors.primary }]}>Total</Text>
-          <Text style={[styles.summaryAmount, { color: theme.colors.primary }]}>${total.toFixed(0)}</Text>
+          <Text style={[styles.summaryLabel, { color: theme.colors.primary }]}>
+            Total
+          </Text>
+          <Text style={[styles.summaryAmount, { color: theme.colors.primary }]}>
+            ${total.toFixed(0)}
+          </Text>
         </View>
 
         <Button
