@@ -91,7 +91,7 @@ export default function DonutDetailScreen({ route }) {
 
       <View style={styles.section}>
         <View style={styles.iconRow}>
-          <Icon name="info-circle" type="font-awesome-5" color={theme.colors.secondary} size={18} />
+          <Icon name="info-circle" type="font-awesome-5" color={theme.colors.primary} size={18} />
           <Text style={styles.sectionTitle}>Details</Text>
         </View>
         <Text style={styles.body}>{donut.practicalInfo}</Text>

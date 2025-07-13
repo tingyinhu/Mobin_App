@@ -1,46 +1,17 @@
-import React, { useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
-
+import React from "react";
 import {
   View,
   StyleSheet,
   FlatList,
-  Image,
-  TouchableOpacity,
 } from "react-native";
-import { Text, Icon, Button } from "@rneui/themed";
+import { Text, Button } from "@rneui/themed";
+import { useCartState } from "../services/CartManager";
 import { theme } from "../theme/theme";
-
-import {
-  getCart,
-  updateQuantity,
-  removeFromCart,
-  saveCart,
-} from "../services/CartManager";
+import CartItem from "../components/CartItem"; // 👈 import
 
 export default function OrderScreen() {
-  const [cartItems, setCartItems] = useState([]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      loadCart();
-    }, [])
-  );
-
-  const loadCart = async () => {
-    const cart = await getCart();
-    setCartItems(cart);
-  };
-
-  const handleUpdateQty = async (id, change) => {
-    const updatedCart = await updateQuantity(id, change);
-    setCartItems(updatedCart);
-  };
-
-  const handleRemove = async (id) => {
-    const updatedCart = await removeFromCart(id);
-    setCartItems(updatedCart);
-  };
+  const cart = useCartState();
+  const cartItems = cart.getCart();
 
   const imageMap = {
     "Chocolate Glaze": require("../assets/donuts/ChocolateDonut.jpg"),
@@ -58,58 +29,48 @@ export default function OrderScreen() {
   };
 
   const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item) => acc + item.product.price * (item.qty || 1),
     0
   );
-  const taxes = Math.round(subtotal * 0.1);
-  const total = subtotal + taxes;
+  const tax = Math.round(subtotal * 0.1);
+  const total = subtotal + tax;
 
-  const renderItem = ({ item }) => (
-    <View style={styles.itemRow}>
-      <Image source={imageMap[item.name]} style={styles.donutImage} />
-      <Text style={styles.name}>{item.name}</Text>
-
-      <View style={styles.qtyControl}>
-        <TouchableOpacity onPress={() => handleUpdateQty(item.id, -1)}>
-          <Icon name="minus" type="font-awesome-5" size={14} />
-        </TouchableOpacity>
-        <Text style={styles.qtyText}>
-          {item.quantity.toString().padStart(2, "0")}
-        </Text>
-        <TouchableOpacity onPress={() => handleUpdateQty(item.id, 1)}>
-          <Icon name="plus" type="font-awesome-5" size={14} />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.price}>${item.price}</Text>
-
-      <TouchableOpacity onPress={() => handleRemove(item.id)}>
-        <Icon
-          name="trash-alt"
-          type="font-awesome-5"
-          color={theme.colors.primary}
-        />
-      </TouchableOpacity>
-    </View>
-  );
+  // quantity handler
+  const adjustQty = (id, type) => {
+    const target = cartItems.find((i) => i.id === id);
+    if (!target) return;
+    const newQty = type === "inc" ? target.qty + 1 : target.qty - 1;
+    if (newQty <= 0) {
+      cart.removeCartItem(id);
+    } else {
+      cart.updateQty(id, newQty);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <FlatList
         data={cartItems}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <CartItem
+            item={item}
+            imageMap={imageMap}
+            onQtyChange={adjustQty}
+            onRemove={cart.removeCartItem}
+          />
+        )}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ paddingBottom: 20 }}
       />
 
+      {/* Summary */}
       <View style={styles.summary}>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>Subtotal</Text>
-          <Text style={styles.summaryAmount}>${subtotal.toFixed(0)}</Text>
+          <Text style={styles.summaryAmount}>${subtotal}</Text>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>Taxes</Text>
-          <Text style={styles.summaryAmount}>${taxes.toFixed(0)}</Text>
+          <Text style={styles.summaryLabel}>Tax</Text>
+          <Text style={styles.summaryAmount}>${tax}</Text>
         </View>
         <View style={styles.line} />
         <View style={styles.summaryRow}>
@@ -117,87 +78,43 @@ export default function OrderScreen() {
             Total
           </Text>
           <Text style={[styles.summaryAmount, { color: theme.colors.primary }]}>
-            ${total.toFixed(0)}
+            ${total}
           </Text>
         </View>
-
-        <Button
-          title="Place the Order"
-          buttonStyle={styles.orderButton}
-          titleStyle={{ fontWeight: "bold", fontSize: 16 }}
-        />
+        <Button title="Place Order" buttonStyle={styles.orderButton} />
+        <Button title="Clear Cart" type="clear" onPress={cart.clearCart} />
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
     padding: theme.spacing.medium,
   },
-  itemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: theme.spacing.small,
-  },
-  donutImage: {
-    width: 50,
-    height: 50,
-    marginRight: theme.spacing.small,
-  },
-  name: {
-    flex: 1,
-    fontSize: 16,
-    color: theme.colors.primary,
-  },
-  qtyControl: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    marginRight: theme.spacing.small,
-  },
-  qtyText: {
-    marginHorizontal: 10,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  price: {
-    fontSize: 16,
-    backgroundColor: theme.colors.primary,
-    color: "#fff",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginRight: theme.spacing.small,
-  },
   summary: {
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderColor: "#ccc",
+    paddingTop: theme.spacing.medium,
   },
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 4,
+    marginVertical: theme.spacing.xs || 4,
   },
   summaryLabel: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: theme.typography.fontSize.medium,
+    fontWeight: theme.typography.fontWeight.bold,
   },
   summaryAmount: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.medium,
   },
   line: {
-    height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 6,
+    borderTopWidth: 1,
+    borderColor: theme.colors.primary,
+    marginVertical: theme.spacing.xs || 6,
   },
   orderButton: {
-    backgroundColor: "#F46E4E",
+    backgroundColor: theme.colors.primary,
     borderRadius: 30,
     marginTop: theme.spacing.medium,
   },

@@ -1,11 +1,10 @@
 export const theme = {
   colors: {
     primary: "#EC6852",
-    secondary: "#F46E4E",
+    secondary: "#C98B45",
     background: "#F8F5DE",
     text: "#333333",
     WhiteText: "#FFFFFF",
-    priceText: "#C98B45",
   },
   typography: {
     regular: 'Open Sans, sans-serif',
