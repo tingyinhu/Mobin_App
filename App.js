@@ -1,61 +1,70 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { SafeAreaProvider } from "react-native-safe-area-context"; // ✅ 加這行
+import { useState, useEffect } from 'react';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { getOnboardingFlag, setOnboardingFlag } from './services/OnboardingManager';
+import OnboardingNavigation from './navigation/OnboardingNavigation';
+import AppStack from './navigation/AppStack';
 
-import { Icon } from "@rneui/themed";
+const RootStack = createNativeStackNavigator();
 
-import HomeScreen from './screens/HomeScreen';
-import DonutScreen from "./screens/DonutScreen";
-import OrderScreen from "./screens/OrderScreen";
-import DonutDetailScreen from "./screens/DonutDetailScreen";
-
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
-
-function TabNavigator() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Donuts"
-        component={DonutScreen}
-        options={{
-          tabBarIcon: () => <Icon type="font-awesome-5" name="clipboard-list" />,
-        }}
-      />
-      <Tab.Screen
-        name="Orders"
-        component={OrderScreen}
-        options={{
-          tabBarIcon: () => <Icon type="font-awesome-5" name="shopping-cart" />,
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
+// Add LoadingScreen component
+const LoadingScreen = () => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color="#EC6852" />
+  </View>
+);
 
 export default function App() {
+  const [showOnboarding, setShowOnboarding] = useState(null);
+  const [fontsLoaded] = useState(true); // In a real app, replace with actual font loading
+
+  useEffect(() => {
+    getOnboardingFlag()
+      .then((res) => {
+        setShowOnboarding(res === true || res === null);
+      })
+      .catch((error) => {
+        console.error('Error checking onboarding:', error);
+        setShowOnboarding(false);
+      });
+  }, []);
+
+  if (!fontsLoaded || showOnboarding === null) {
+    return <LoadingScreen />;
+  }
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="HomeTabs"
-            component={TabNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="DonutDetail"
-            component={DonutDetailScreen}
-            options={{ title: "Donut Detail" }}
-          />
-        </Stack.Navigator>
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          {showOnboarding ? (
+            <RootStack.Screen name="OnboardingFlow">
+              {(props) => (
+                <OnboardingNavigation 
+                  {...props} 
+                  onComplete={() => {
+                    setShowOnboarding(false);
+                    setOnboardingFlag(false);
+                  }}
+                />
+              )}
+            </RootStack.Screen>
+          ) : (
+            <RootStack.Screen name="App" component={AppStack} />
+          )}
+        </RootStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+});

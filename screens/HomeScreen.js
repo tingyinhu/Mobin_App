@@ -22,7 +22,7 @@ export default function HomeScreen({ navigation }) {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("HomeTabs")}
+            onPress={() => navigation.navigate("MainTabs")}
           >
             <Text style={styles.buttonText}>Grab donuts</Text>
           </TouchableOpacity>
