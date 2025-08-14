@@ -1,4 +1,3 @@
-
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Icon } from "@rneui/themed";
 import { theme } from "../theme/theme";

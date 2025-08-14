@@ -1,18 +1,26 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  FlatList,
-} from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Text, Button } from "@rneui/themed";
 import { useCartState } from "../services/CartManager";
 import { theme } from "../theme/theme";
-import CartItem from "../components/CartItem"; // 👈 import
+import CartItem from "../components/CartItem";
 
 export default function OrderScreen() {
+  // Access cart state via Hookstate manager
   const cart = useCartState();
-  const cartItems = cart.getCart();
 
+  // Get raw Hookstate data from cart store
+  const raw = cart.getCart();
+
+  const cartItems = React.useMemo(() => {
+    try {
+      return Array.isArray(raw) ? JSON.parse(JSON.stringify(raw)) : [];
+    } catch {
+      return [];
+    }
+  }, [raw]);
+
+  // Image map for each donut type (used by CartItem component)
   const imageMap = {
     "Chocolate Glaze": require("../assets/donuts/ChocolateDonut.jpg"),
     "Strawberry Sprinkle": require("../assets/donuts/StrawberryDonut.jpg"),
@@ -28,41 +36,63 @@ export default function OrderScreen() {
     "Donut Box": require("../assets/donuts/DonutBox.jpg"),
   };
 
+  // --- Calculate totals (on plain JS array) ---
+  // Sum of (price * quantity) for each item
   const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.product.price * (item.qty || 1),
+    (acc, item) => acc + (item?.product?.price || 0) * (item?.qty || 1),
     0
   );
-  const tax = Math.round(subtotal * 0.1);
+  // Tax = 15% of subtotal (rounded)
+  const tax = Math.round(subtotal * 0.15);
+  // Final total
   const total = subtotal + tax;
 
-  // quantity handler
+  /**
+   * Adjust quantity of a given item
+   * @param {number|string} id - Item ID
+   * @param {"inc"|"dec"} type - Whether to increase or decrease qty
+   */
   const adjustQty = (id, type) => {
     const target = cartItems.find((i) => i.id === id);
     if (!target) return;
-    const newQty = type === "inc" ? target.qty + 1 : target.qty - 1;
+
+    const currentQty = target.qty || 1;
+    const newQty = type === "inc" ? currentQty + 1 : currentQty - 1;
+
     if (newQty <= 0) {
+      // Remove item if qty is 0 or negative
       cart.removeCartItem(id);
     } else {
+      // Update qty in cart
       cart.updateQty(id, newQty);
     }
   };
 
+  // Renders each cart row
+  const renderRow = ({ item }) => (
+    <CartItem
+      item={item}
+      imageMap={imageMap}
+      onQtyChange={adjustQty}
+      onRemove={cart.removeCartItem}
+    />
+  );
+
   return (
     <View style={styles.container}>
+      {/* Cart item list */}
       <FlatList
         data={cartItems}
-        renderItem={({ item }) => (
-          <CartItem
-            item={item}
-            imageMap={imageMap}
-            onQtyChange={adjustQty}
-            onRemove={cart.removeCartItem}
-          />
-        )}
-        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderRow}
+        keyExtractor={(item) => String(item.id)}
+        ListEmptyComponent={
+          <Text style={{ textAlign: "center", marginTop: 24, color: theme.colors.text }}>
+            Your cart is empty.
+          </Text>
+        }
       />
 
-      {/* Summary */}
+      {/* Summary section */}
       <View style={styles.summary}>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>Subtotal</Text>
@@ -81,12 +111,14 @@ export default function OrderScreen() {
             ${total}
           </Text>
         </View>
+        {/* Actions */}
         <Button title="Place Order" buttonStyle={styles.orderButton} />
         <Button title="Clear Cart" type="clear" onPress={cart.clearCart} />
       </View>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -117,5 +149,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     borderRadius: 30,
     marginTop: theme.spacing.medium,
+    paddingHorizontal: 20,
   },
 });
